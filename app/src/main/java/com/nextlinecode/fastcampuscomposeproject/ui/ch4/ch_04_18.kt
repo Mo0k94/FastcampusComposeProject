@@ -19,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -118,17 +119,17 @@ fun TopLevel(viewModel: TodoViewModel = viewModel()) {
     Scaffold{
         Column {
             TodoInput(
-                text = viewModel.text.value,
-                onTextChange = {
-                    viewModel.text.value = it
-                },
-                onSubmit = viewModel.onSubmit)
+                text = viewModel.text.observeAsState("").value,
+                onTextChange = viewModel.setText,
+                onSubmit = viewModel.onSubmit
+            )
             /*
             * 단계 3 : `LazyColumn`으로 `toDoList`를 표시합시다.
             * `key`를 `toDoData`의 `key`를 사용합니다.
             * */
+            val items = viewModel.toDoList.observeAsState(emptyList()).value
             LazyColumn {
-                items(viewModel.toDoList, key = { it.key }) { todoData ->
+                items(items, key = { it.key }) { todoData ->
                     Todo(
                         todoData = todoData,
                         onEdit = viewModel.onEdit,
